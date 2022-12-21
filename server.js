@@ -42,4 +42,23 @@ app.use(function (err, req, res, next) {
 })
 
 const port = process.env.PORT || 5000;
-app.listen(port, () => console.log(`Server is running on port ${port}`))
+const server = app.listen(port, () => console.log(`Server is running on port ${port}`))
+
+const io = require('socket.io')(server)
+io.on('connection', (socket) => {
+    console.log("Connect successfully --> ", socket.id)
+
+    user_id = socket.handshake.query.user_id
+    socket.join(user_id)
+
+    socket.on('disconnect', () => {
+        console.log("Disconnect --> ", socket.id)
+        socket.leave(user_id)
+    })
+    
+    socket.on('send', (data) => {
+        console.log(data)
+        // socket.in(data.receiver).emit('receive', data)
+        socket.in(data.receiver).emit('noti', "new message")
+    })
+})

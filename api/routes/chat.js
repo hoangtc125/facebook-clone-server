@@ -372,7 +372,7 @@ router.post('/get_list_conversation', verify, async (req, res) => {
         else{
             partner = await User.findById(x.firstUser);
         }
-        lastDialog = x.dialog[x.dialog.length - 1];
+        lastDialog = x.dialog[x.dialog.length - 1] || [];
         conversationInfo.id = x.conversationId;
         conversationInfo.partner.id = partner._id;
         conversationInfo.partner.username = partner.name;
