@@ -45,17 +45,12 @@ const subjectArray = {
 const categoryArray = ['0', '1'];
 
 // Create new storage instance with Firebase project credentials
-const storage = new Storage({
-    projectId: process.env.GCLOUD_PROJECT_ID,
-    credentials: {
-        private_key: process.env.private_key,
-        client_email: process.env.client_email
-    }
+const storage = new Storage({ keyFilename:"social-network-9b13f-0321d923c18a.json"
 });
 
 // Create a bucket associated to Firebase storage bucket
 const bucket =
-    storage.bucket(process.env.GCLOUD_STORAGE_BUCKET_URL);
+    storage.bucket("social-network-9b13f.appspot.com");
 
 // Initiating a memory storage engine to store files as Buffer objects
 const uploader = multer({
