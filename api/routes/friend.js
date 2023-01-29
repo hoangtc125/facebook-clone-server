@@ -414,7 +414,7 @@ router.post('/get_user_friends', verify, async (req, res) => {
     } else {
       targetUser = thisUser;
     }
-    await targetUser.populate({ path: 'friends.friend', select: 'friends' }).execPopulate();
+    await targetUser.populate({ path: 'friends.friend', select: 'friends _id name avatar' }).execPopulate();
     // console.log(targetUser);
 
     let endFor = targetUser.friends.length < index + count ? targetUser.friends.length : index + count;
@@ -428,7 +428,7 @@ router.post('/get_user_friends', verify, async (req, res) => {
         created: null //time start friend between this guy and targetUser
       }
       friendInfor.id = x.friend._id.toString();
-      friendInfor.username = x.friend.username;
+      friendInfor.username = x.friend.name;
       friendInfor.avatar = x.friend.avatar.url;
       friendInfor.created = validTime.timeToSecond(x.createdAt) ;
 
