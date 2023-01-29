@@ -22,7 +22,6 @@ mongoose.connect(url,
 
 // use Routes
 app.use('/it4788/auth', require('./api/routes/auth'));
-app.use('/it4788/friend', require('./api/routes/friend'));
 app.use('/it4788/post', require('./api/routes/posts'));
 app.use('/it4788/search', require('./api/routes/search'));
 app.use('/it4788/comment', require('./api/routes/comments'));
