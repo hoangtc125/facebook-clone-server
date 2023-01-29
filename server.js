@@ -45,6 +45,9 @@ const port = process.env.PORT || 5000;
 const server = app.listen(port, () => console.log(`Server is running on port ${port}`))
 
 const io = require('socket.io')(server)
+
+const notiModel = ({from, to, api, params}) => {return {from, to, api, params}}
+
 io.on('connection', (socket) => {
     console.log("Connect successfully --> ", socket.id)
 
@@ -56,9 +59,9 @@ io.on('connection', (socket) => {
         socket.leave(user_id)
     })
     
-    socket.on('send', (data) => {
+    socket.on('chat', (data) => {
+        data = notiModel({...data})
         console.log(data)
-        // socket.in(data.receiver).emit('receive', data)
-        socket.in(data.receiver).emit('noti', "new message")
+        socket.in(data.to).emit('noti', data)
     })
 })
