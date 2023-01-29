@@ -49,6 +49,7 @@ router.post('/get_requested_friends', verify, async (req, res) => {
       let sentUser;
       let newElement = {
         id: null, // id người gửi req
+        
         username: null, // tên người gửi req
         avatar: null, // link avatar người gửi req
         same_friends: null, // số bạn chung
