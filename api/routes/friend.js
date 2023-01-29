@@ -299,6 +299,7 @@ router.post('/set_accept_friend', verify, async (req, res) => {
         let indexExist1 = sentUser.friendRequestSent.findIndex(element =>
           element._id.equals(thisUser._id));
         sentUser.friendRequestSent.splice(indexExist1, 1);
+        
         // save
         thisUser = await thisUser.save();
         sentUser = await sentUser.save();
