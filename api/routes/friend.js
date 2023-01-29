@@ -26,7 +26,7 @@ router.post('/get_requested_friends', verify, async (req, res) => {
   let { index, count } = req.query;
   let id = req.user.id;
   let data = {
-    request: [],
+    list_user: [],
     total: 0
   };
   let thisUser;
@@ -68,9 +68,9 @@ router.post('/get_requested_friends', verify, async (req, res) => {
         newElement.same_friends = countSameFriend(thisUser.friends, sentUser.friends);
       }
       newElement.created = validTime.timeToSecond(thisUser.friendRequestReceived[i].lastCreated);
-      data.request.push(newElement);
+      data.list_user.push(newElement);
     }
-    if (data.request.length == 0) return callRes(res, responseError.NO_DATA_OR_END_OF_LIST_DATA);
+    if (data.list_user.length == 0) return callRes(res, responseError.NO_DATA_OR_END_OF_LIST_DATA);
     thisUser = await User.findById(id);
     data.total = thisUser.friendRequestReceived.length;
     return callRes(res, responseError.OK, data);
@@ -388,7 +388,7 @@ router.post('/get_user_friends', verify, async (req, res) => {
   let id = req.user.id;
 
   let data = {
-    friends: [],
+    list_user: [],
     total: 0
   }
   if (user_id && typeof user_id != 'string')
@@ -436,9 +436,9 @@ router.post('/get_user_friends', verify, async (req, res) => {
         if (thisUser.friends.length > 0 && x.friend.friends.length > 0) {
           friendInfor.same_friends = countSameFriend(thisUser.friends, x.friend.friends);
         }
-      data.friends.push(friendInfor);
+      data.list_user.push(friendInfor);
     }
-    if (data.friends.length == 0) return callRes(res, responseError.NO_DATA_OR_END_OF_LIST_DATA, 'friends');
+    if (data.list_user.length == 0) return callRes(res, responseError.NO_DATA_OR_END_OF_LIST_DATA, 'friends');
     data.total = targetUser.friends.length;
     return callRes(res, responseError.OK, data);
   } catch (error) {
