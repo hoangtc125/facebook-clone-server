@@ -45,8 +45,12 @@ const subjectArray = {
 const categoryArray = ['0', '1'];
 
 // Create new storage instance with Firebase project credentials
-const storage = new Storage({ keyFilename:"social-network-9b13f-0321d923c18a.json"
-});
+const storage = new Storage({
+    projectId: process.env.GCLOUD_PROJECT_ID,
+    credentials: {
+        private_key: process.env.private_key,
+        client_email: process.env.client_email
+    }});
 
 // Create a bucket associated to Firebase storage bucket
 const bucket =
@@ -184,6 +188,9 @@ CAN_NOT_CONNECT_TO_DB neu get post loi
 */
 router.post('/get_list_posts', async (req, res) => {
     var {token, index, count, last_id} = req.query;
+
+    // token = req.query.token;
+    console.log(index);
     var data;
     // PARAMETER_IS_NOT_ENOUGH
     if((index !== 0 && !index) || (count !== 0 && !count)) {
@@ -211,6 +218,7 @@ router.post('/get_list_posts', async (req, res) => {
     }
 
     var user, posts;
+
     try {
         if(token) {
             user = await getUserIDFromToken(token);
@@ -257,7 +265,8 @@ router.post('/get_list_posts', async (req, res) => {
                 modified: post.modified.toString(),
                 like: post.likedUser.length.toString(),
                 comment: post.comments.length.toString(),
-                is_liked: user ? (post.likedUser.includes(user._id) ? "1": "0") : "0",
+                is_liked: user ? (post.likedUser.includes(user.id) ? "1": "0") : "0",
+                // is_liked: post.likedUser.includes(user._id) ? "1": "0",
                 is_blocked: is_blocked(user, post.author),
                 can_comment: "1",
                 can_edit: can_edit(user, post.author),
@@ -370,13 +379,14 @@ function can_edit(user, author) {
 function uploadFile(file) {
     const newNameFile = new Date().toISOString() + file.originalname;
     const blob = bucket.file(newNameFile);
+    console.log(file.mimetype);
     const blobStream = blob.createWriteStream({
         metadata: {
-            contentType: file.mimetype,
+            // contentType: file.mimetype == "application/octet-stream" ? "image/jpg" :"image/png" ,
+            contentType: file.mimetype
         },
     });
-    const publicUrl =
-        `https://firebasestorage.googleapis.com/v0/b/${bucket.name}/o/${encodeURI(blob.name)}?alt=media`;
+    const publicUrl =`https://storage.googleapis.com/${bucket.name}/${encodeURI(blob.name)}`;
     return new Promise((resolve, reject) => {
 
         blobStream.on('error', function(err) {
@@ -473,10 +483,10 @@ router.post('/add_post', cpUpload, verify, async (req, res, next) => {
             const filetypes = /jpeg|jpg|png/;
             const mimetype = filetypes.test(item_image.mimetype);
             // PARAMETER_TYPE_IS_INVALID
-            if(!mimetype) {
-                console.log("Mimetype image is invalid");
-                return setAndSendResponse(res, responseError.PARAMETER_VALUE_IS_INVALID);
-            }
+            // if(!mimetype) {
+            //     console.log("Mimetype image is invalid");
+            //     return setAndSendResponse(res, responseError.PARAMETER_VALUE_IS_INVALID);
+            // }
 
             // FILE_SIZE_IS_TOO_BIG
             if (item_image.buffer.byteLength > MAX_SIZE_IMAGE) {
@@ -508,10 +518,10 @@ router.post('/add_post', cpUpload, verify, async (req, res, next) => {
         for(const item_video of video) {
             const filetypes = /mp4/;
             const mimetype = filetypes.test(item_video.mimetype);
-            if(!mimetype) {
-                console.log("Mimetype video is invalid");
-                return setAndSendResponse(res, responseError.PARAMETER_VALUE_IS_INVALID);
-            }
+            // if(!mimetype) {
+            //     console.log("Mimetype video is invalid");
+            //     return setAndSendResponse(res, responseError.PARAMETER_VALUE_IS_INVALID);
+            // }
 
             if (item_video.buffer.byteLength > MAX_SIZE_VIDEO) {
                 console.log("Max video file size");
@@ -796,10 +806,10 @@ router.post('/edit_post', cpUpload, verify, async (req, res) => {
         for(const item_video of video) {
             const filetypes = /mp4/;
             const mimetype = filetypes.test(item_video.mimetype);
-            if(!mimetype) {
-                console.log("Mimetype video is invalid");
-                return setAndSendResponse(res, responseError.PARAMETER_VALUE_IS_INVALID);
-            }
+            // if(!mimetype) {
+            //     console.log("Mimetype video is invalid");
+            //     return setAndSendResponse(res, responseError.PARAMETER_VALUE_IS_INVALID);
+            // }
 
             if (item_video.buffer.byteLength > MAX_SIZE_VIDEO) {
                 console.log("Max video file size");
@@ -837,10 +847,10 @@ router.post('/edit_post', cpUpload, verify, async (req, res) => {
         for(const item_image of image) {
             const filetypes = /jpeg|jpg|png/;
             const mimetype = filetypes.test(item_image.mimetype);
-            if(!mimetype) {
-                console.log("Mimetype image is invalid");
-                return setAndSendResponse(res, responseError.PARAMETER_VALUE_IS_INVALID);
-            }
+            // if(!mimetype) {
+            //     console.log("Mimetype image is invalid");
+            //     return setAndSendResponse(res, responseError.PARAMETER_VALUE_IS_INVALID);
+            // }
 
             if (item_image.buffer.byteLength > MAX_SIZE_IMAGE) {
                 console.log("Max image file size");
