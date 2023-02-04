@@ -12,17 +12,17 @@ var multer  = require('multer');
 const { Storage } = require('@google-cloud/storage');
 const MAX_SIZE_IMAGE = 4 * 1024 * 1024; // for 4MB
 const {getUserIDFromToken} = require('../utils/getUserIDFromToken');
-// Create new storage instance with Firebase project credentials
+
 const storage = new Storage({
   projectId: process.env.GCLOUD_PROJECT_ID,
   credentials: {
       private_key: process.env.private_key,
       client_email: process.env.client_email
-  }
-});
+  }});
 
 // Create a bucket associated to Firebase storage bucket
-const bucket = storage.bucket(process.env.GCLOUD_STORAGE_BUCKET_URL);
+const bucket =
+  storage.bucket("social-network-9b13f.appspot.com");
 
 // Initiating a memory storage engine to store files as Buffer objects
 const uploader = multer({
@@ -146,8 +146,8 @@ router.post('/set_user_info', cpUpload, verify, async (req, res) => {
     if (fileAvatar) {
       if (!checkSizeImage(fileAvatar)) 
         return callRes(res, responseError.FILE_SIZE_IS_TOO_BIG, 'avatar: file quá lớn, max = 4MB');
-      if (!checkTypeImage(fileAvatar))
-        return callRes(res, responseError.PARAMETER_TYPE_IS_INVALID, 'avatar: sai định dạng');
+      // if (!checkTypeImage(fileAvatar))
+      //   return callRes(res, responseError.PARAMETER_TYPE_IS_INVALID, 'avatar: sai định dạng');
       if (user.avatar.filename){
         try {
           console.log('xoa avatar...');
@@ -168,8 +168,8 @@ router.post('/set_user_info', cpUpload, verify, async (req, res) => {
     if (fileCoverImage) {
       if (!checkSizeImage(fileCoverImage)) 
         return callRes(res, responseError.FILE_SIZE_IS_TOO_BIG, 'cover_image: file quá lớn, max = 4MB');
-      if (!checkTypeImage(fileCoverImage))
-        return callRes(res, responseError.PARAMETER_TYPE_IS_INVALID, 'cover_image: sai định dạng');
+      // if (!checkTypeImage(fileCoverImage))
+      //   return callRes(res, responseError.PARAMETER_TYPE_IS_INVALID, 'cover_image: sai định dạng');
       if (user.coverImage.filename){
         try {
           console.log('xoa coverImage...');
@@ -234,7 +234,7 @@ function uploadFile(file) {
       },
   });
   const publicUrl =
-      `https://firebasestorage.googleapis.com/v0/b/${bucket.name}/o/${encodeURI(blob.name)}?alt=media`;
+  `https://storage.googleapis.com/${bucket.name}/${encodeURI(blob.name)}`;
   return new Promise((resolve, reject) => {
 
       blobStream.on('error', function(err) {

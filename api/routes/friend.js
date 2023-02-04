@@ -514,6 +514,65 @@ router.post('/get_list_suggested_friends', verify, async (req, res) => {
     return callRes(res, responseError.UNKNOWN_ERROR, error.message);
   }
 })
+router.post('/get_list_friends', verify, async (req, res) => {
+  let { index, count } = req.query;
+  let id = req.user.id;
+  let data = {
+    request: [],
+    total: 0
+  };
+  let thisUser;
+
+  // check input data
+  if ( index === undefined|| count === undefined)
+    return callRes(res, responseError.PARAMETER_IS_NOT_ENOUGH, ': index, count');
+  if (!checkInput.checkIsInteger (index) || !checkInput.checkIsInteger (count))
+    return callRes(res, responseError.PARAMETER_TYPE_IS_INVALID, ': index, count');
+  if (index < 0 || count < 0) return callRes(res, responseError.PARAMETER_VALUE_IS_INVALID, ': index, count');
+
+  try {
+    thisUser = await User.findById(id)
+      .select({ "friends": 1})
+      .populate('friends');
+    // console.log(thisUser);
+
+    let endFor = thisUser.friends.length < index + count ? thisUser.friends.length : index + count;
+    for (let i = index; i < endFor; i++) {
+      let sentUser;
+      let newElement = {
+        id: null, // id người gửi req
+        username: null, // tên người gửi req
+        avatar: null, // link avatar người gửi req
+        same_friends: null, // số bạn chung
+        created: null, // thời gian gần nhất req
+      }
+      let sentUserID = thisUser.friends[i].friend.toString();
+      sentUser = await User.findById(sentUserID)
+        .select({ "friends": 1, "phoneNumber": 1, "_id": 1, "name": 1, "avatar": 1 });
+        console.log(sentUser);
+
+      // console.log(sentUser);
+      newElement.id = sentUser._id;
+      newElement.username = sentUser.name;
+      newElement.avatar = sentUser.avatar.url;
+      newElement.same_friends = 0;
+      // find number of same_friends
+      if (thisUser.friends.length != 0 && sentUser.friends.length != 0) {
+        newElement.same_friends = countSameFriend(thisUser.friends, sentUser.friends);
+      }
+      newElement.created = validTime.timeToSecond(thisUser.friends[i].createdAt);
+      data.request.push(newElement);
+    }
+    if (data.request.length == 0) return callRes(res, responseError.NO_DATA_OR_END_OF_LIST_DATA);
+    thisUser = await User.findById(id);
+    data.total = thisUser.friends.length;
+    return callRes(res, responseError.OK, data);
+  } catch (error) {
+    console.log(error);
+    return callRes(res, responseError.UNKNOWN_ERROR);
+  }
+})
+
 
 // count same friend between 2 array x, y
 function countSameFriend(x, y) {

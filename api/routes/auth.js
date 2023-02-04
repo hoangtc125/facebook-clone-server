@@ -395,9 +395,9 @@ router.post("/change_info_after_signup", verify, uploader.single('avatar'), asyn
       if (req.file.size > MAX_SIZE_IMAGE){
       return callRes(res, responseError.FILE_SIZE_IS_TOO_BIG);
       }
-      if (req.file.mimetype != 'image/jpeg' && req.file.mimetype != 'image/jpg' && req.file.mimetype != 'image/png'){
-          return callRes(res, responseError.PARAMETER_VALUE_IS_INVALID, 'image type');
-      }
+      // if (req.file.mimetype != 'image/jpeg' && req.file.mimetype != 'image/jpg' && req.file.mimetype != 'image/png'){
+      //     return callRes(res, responseError.PARAMETER_VALUE_IS_INVALID, 'image type');
+      // }
          let id = req.user.id;
          var user = await User.findById(id);
 
@@ -486,8 +486,7 @@ function uploadFile(file) {
           contentType: file.mimetype,
       },
   });
-  const publicUrl =
-      `https://firebasestorage.googleapis.com/v0/b/${bucket.name}/o/${encodeURI(blob.name)}?alt=media`;
+  const publicUrl = `https://storage.googleapis.com/${bucket.name}/${encodeURI(blob.name)}`;
   return new Promise((resolve, reject) => {
 
       blobStream.on('error', function(err) {
