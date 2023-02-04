@@ -234,7 +234,7 @@ function uploadFile(file) {
       },
   });
   const publicUrl =
-  `https://storage.googleapis.com/${bucket.name}/${encodeURI(blob.name)}`;;
+  `https://storage.googleapis.com/${bucket.name}/${encodeURI(blob.name)}`;
   return new Promise((resolve, reject) => {
 
       blobStream.on('error', function(err) {
